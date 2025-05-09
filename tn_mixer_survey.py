@@ -1,5 +1,4 @@
 import streamlit as st
-import json
 from google.oauth2 import service_account
 import gspread
 
