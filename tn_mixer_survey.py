@@ -1,6 +1,6 @@
 import streamlit as st
-import pandas as pd
-import os
+import gspread
+from google.oauth2 import service_account
 
 st.set_page_config(page_title="TN Mixer Feedback Survey", layout="centered")
 
@@ -28,27 +28,28 @@ st.header("4. Future Participation")
 future_interest = st.radio("Would you be interested in participating in a future TN Mixer?", ["Yes", "Maybe", "No"])
 additional_comments = st.text_area("Any other comments, ideas, or suggestions?")
 
-# Submit button
-if st.button("Submit"):
-    response = {
-        "Rating": rating,
-        "Enjoyed Most": enjoy_most,
-        "Improvements": improvements,
-        "Partner Helpful": partner_helpful,
-        "Prompts Useful": prompts_useful,
-        "Comfort Level": comfort,
-        "Facilitator Feedback": facilitator_feedback,
-        "Future Interest": future_interest,
-        "Additional Comments": additional_comments
-    }
+# Setup Google Sheets connection
+creds_dict = st.secrets["gcp_service_account"]
+creds = service_account.Credentials.from_service_account_info(creds_dict)
+client = gspread.authorize(creds)
 
-    df = pd.DataFrame([response])
 
-    # Save to CSV (append mode)
-    csv_file = "tn_mixer_survey_responses.csv"
-    if os.path.exists(csv_file):
-        df.to_csv(csv_file, mode='a', index=False, header=False)
-    else:
-        df.to_csv(csv_file, index=False)
+# Open your sheet
+sheet = client.open("TN Mixer Survey Responses").sheet1
 
-    st.success("Thank you for your feedback! Your responses have been recorded.")
+# Prepare data
+response = [
+    rating,
+    enjoy_most,
+    improvements,
+    partner_helpful,
+    prompts_useful,
+    comfort,
+    facilitator_feedback,
+    future_interest,
+    additional_comments
+]
+
+# Append to sheet
+sheet.append_row(response)
+st.success("Thank you! Your response has been submitted to Google Sheets.")
