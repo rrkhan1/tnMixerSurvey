@@ -1,5 +1,6 @@
-streamlit
+streamlit~=1.45.0
 pandas
-gspread
+gspread~=6.2.0
 oauth2client
 google-auth
+protobuf~=6.30.2
