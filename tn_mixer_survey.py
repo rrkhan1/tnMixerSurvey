@@ -39,8 +39,10 @@ if st.button("Submit"):
     )
     client = gspread.authorize(creds)
 
-    # Open sheet and append row
-    sheet = client.open("TN Mixer Survey Responses").sheet1
+    # Use your actual Google Sheet ID here
+    SHEET_ID = "1-CPDTmaqeFsxNXOjewc78c3U156fpOAQMyEm9CkowcM"
+    sheet = client.open_by_key(SHEET_ID).sheet1
+
     row = [
         rating,
         enjoy_most,
