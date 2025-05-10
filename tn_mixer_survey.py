@@ -31,15 +31,17 @@ additional_comments = st.text_area("Any other comments, ideas, or suggestions?")
 
 # Submit button
 if st.button("Submit"):
-    # Authenticate using secrets
+    # Authenticate with correct scopes
     creds_dict = st.secrets["gcp_service_account"]
-    creds = service_account.Credentials.from_service_account_info(creds_dict)
-    scoped_creds = creds.with_scopes(["https://www.googleapis.com/auth/spreadsheets"])
-    client = gspread.authorize(scoped_creds)
+    creds = service_account.Credentials.from_service_account_info(
+        creds_dict,
+        scopes=["https://www.googleapis.com/auth/spreadsheets"]
+    )
+    client = gspread.authorize(creds)
 
-    # Open Google Sheet and append row
+    # Open sheet and append row
     sheet = client.open("TN Mixer Survey Responses").sheet1
-    response = [
+    row = [
         rating,
         enjoy_most,
         improvements,
@@ -50,5 +52,5 @@ if st.button("Submit"):
         future_interest,
         additional_comments
     ]
-    sheet.append_row(response)
-    st.success("Thank you! Your response has been submitted to Google Sheets.")
+    sheet.append_row(row)
+    st.success("Thank you! Your response has been submitted.")
