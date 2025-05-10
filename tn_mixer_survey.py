@@ -34,7 +34,8 @@ if st.button("Submit"):
     # Authenticate using secrets
     creds_dict = st.secrets["gcp_service_account"]
     creds = service_account.Credentials.from_service_account_info(creds_dict)
-    client = gspread.authorize(creds)
+    scoped_creds = creds.with_scopes(["https://www.googleapis.com/auth/spreadsheets"])
+    client = gspread.authorize(scoped_creds)
 
     # Open Google Sheet and append row
     sheet = client.open("TN Mixer Survey Responses").sheet1
