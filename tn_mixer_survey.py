@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import gspread
+from datetime import datetime
 from google.oauth2 import service_account
 
 st.set_page_config(page_title="TN Mixer Feedback Survey", layout="centered")
@@ -31,7 +32,6 @@ additional_comments = st.text_area("Any other comments, ideas, or suggestions?")
 
 # Submit button
 if st.button("Submit"):
-    # Authenticate with correct scopes
     creds_dict = st.secrets["gcp_service_account"]
     creds = service_account.Credentials.from_service_account_info(
         creds_dict,
@@ -39,11 +39,27 @@ if st.button("Submit"):
     )
     client = gspread.authorize(creds)
 
-    # Use your actual Google Sheet ID here
     SHEET_ID = "1-CPDTmaqeFsxNXOjewc78c3U156fpOAQMyEm9CkowcM"
     sheet = client.open_by_key(SHEET_ID).sheet1
 
+    # Add headers if sheet is empty
+    if sheet.row_count == 0 or sheet.cell(1, 1).value in (None, ""):
+        headers = [
+            "Timestamp",
+            "Rating",
+            "Enjoyed Most",
+            "Improvements",
+            "Partner Helpful",
+            "Prompts Useful",
+            "Comfort Level",
+            "Facilitator Feedback",
+            "Future Interest",
+            "Additional Comments"
+        ]
+        sheet.append_row(headers)
+
     row = [
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         rating,
         enjoy_most,
         improvements,
